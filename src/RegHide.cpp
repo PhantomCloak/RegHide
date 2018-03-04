@@ -37,8 +37,9 @@ void OpenRegistryKey(wchar_t KeyPath[],HANDLE * Key)
 		std::cout << "An error occured\n";
 }
 
-NTSTATUS CreateHiddenRegistryKey(HANDLE * hKey, wchar_t KeyPath[], wchar_t KeyName[])
+NTSTATUS __stdcall CreateHiddenRegistryKey(HANDLE * hKey, wchar_t * KeyPath, wchar_t KeyName[])
 {
+	//exit(1);
 	NTSTATUS status;
 	OBJECT_ATTRIBUTES objAttrs;
 	UNICODE_STRING KeyNameUni;
@@ -47,9 +48,8 @@ NTSTATUS CreateHiddenRegistryKey(HANDLE * hKey, wchar_t KeyPath[], wchar_t KeyNa
 	int KeyNameBufferLenght = (wcslen(KeyPath) + wcslen(KeyName) + 1);
 
 	//Create new buffer for Null-Terminating buffer
-	wchar_t * KeyNameBuffer = (wchar_t*)malloc(KeyNameBufferLenght);
+	wchar_t * KeyNameBuffer = new wchar_t[KeyNameBufferLenght];
 
-	//Copy KeyName to Buffer
 	wcscpy(KeyNameBuffer, KeyPath);
 
 	wcscat(KeyNameBuffer, L"\\");
@@ -69,7 +69,7 @@ NTSTATUS CreateHiddenRegistryKey(HANDLE * hKey, wchar_t KeyPath[], wchar_t KeyNa
 
 	return status = _NtCreateKey(hKey, KEY_ALL_ACCESS, &objAttrs, 0, NULL, REG_OPTION_NON_VOLATILE, NULL);
 }
-NTSTATUS CreateHiddenRegistryValue(HANDLE hKey, wchar_t ValueName[], PVOID Data, ULONG DataSize, ULONG Type)
+NTSTATUS __stdcall CreateHiddenRegistryValue(HANDLE hKey, wchar_t ValueName[], PVOID Data, ULONG DataSize, ULONG Type)
 {
 	UNICODE_STRING ValueNameUni;
 	NTSTATUS status;
@@ -81,8 +81,8 @@ NTSTATUS CreateHiddenRegistryValue(HANDLE hKey, wchar_t ValueName[], PVOID Data,
 
 int main()
 {
-	InitFunctions(); //Initialize Native Api's
 
+	InitFunctions(); //Initialize Native Api's
 	NTSTATUS status;
 #if MODE == 1 //Mode 0 Create Hidden Value , Mode 1 Create Hidden Key
 
@@ -115,7 +115,6 @@ int main()
 	return 0;
 #else
 	HANDLE hKey;
-
 	status = CreateHiddenRegistryKey(&hKey, L"\\Registry\\Machine\\Software", L"HiddenKey");
 
 	if (hKey == 0)
@@ -123,12 +122,16 @@ int main()
 	
 	if (NT_SUCCESS(status))
 	{
-		std::cout << "value created successfully.";
+		std::cout << "value created successfully.\n";
 	}
 	else
 	{
 		std::cout << "an error occurred while value creating.\n";
 	}
+
+	std::cout << "Press any key to delete hidden value from registry\n";
+
+	std::cin.get();
 
 	NTSTATUS deleteStatus = _NtDeleteKey(hKey);
 
@@ -142,7 +145,7 @@ int main()
 	}
 
 	_NtClose(hKey);
-
+	system("pause");
 	return 0;
 #endif
 	
