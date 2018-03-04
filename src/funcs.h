@@ -11,12 +11,22 @@ UNICODE_STRING StrToUnicode(wchar_t * str, int lenght)
 
 	return retStr;
 }
-
-void catnull(wchar_t * dest, wchar_t * src)
+void widecpy(wchar_t * dest, wchar_t * src)
 {
+	int src_len = wcslen(dest) * sizeof(wchar_t);
+	
+	for (int i = 0 ; i < src_len; i++)
+	{
+		dest[i] = src[i];
+	}
+	
+}
+void catnull(wchar_t  * dest, wchar_t * src)
+{
+
 	int dest_len = wcslen(dest);
 	int src_len = wcslen(src);
-
+	
 	dest[dest_len] = '\0';
 
 	//dest_len++;
