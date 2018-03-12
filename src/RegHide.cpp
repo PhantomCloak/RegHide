@@ -99,8 +99,6 @@ int main()
 	if (hKey == 0)
 		goto badhandle;
 
-	_NtClose(hKey);
-
 	status = CreateHiddenRegistryValue(hKey, name,value ,wcslen(value) * sizeof(wchar_t) , REG_SZ);
 
 	if (NT_SUCCESS(status))
